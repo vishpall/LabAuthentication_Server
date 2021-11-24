@@ -32,7 +32,7 @@ public class Utility_server {
     public static String SysAllocated_parser;
     // constructor to put ip address and port
     public Utility_server(String address, String port, String roll, String name) throws IOException {
-        String[] str = new String[] {roll,name,"login","login"};
+        String[] str = new String[] {"1602-18-735-031","rohit","login","login"};
         int j=0;
         // establish a connection
         try
@@ -58,7 +58,7 @@ public class Utility_server {
         }
 
         // string to read message from input
-        String line = "";
+        String line = "null";
 
         // keep reading until "Over" is input
 
@@ -110,6 +110,7 @@ public class Utility_server {
                 //sc.close();
                 //System.out.print("You have entered: "+roll);
                 forName("com.mysql.cj.jdbc.Driver");
+
                 Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/lab","root","Lab@Authentication123");
                 Statement stmt = con.createStatement();
                 ResultSet rs=stmt.executeQuery("select * from clients where status=1");
