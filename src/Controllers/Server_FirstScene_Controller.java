@@ -111,10 +111,8 @@ public class Server_FirstScene_Controller
 		{
 			// disable 'New user' checkbox
 			this.newUser.setDisable(true);
-			
 			// start the video capture
 			this.capture.open(0);
-			
 			// is the video stream available?
 			if (this.capture.isOpened())
 			{
