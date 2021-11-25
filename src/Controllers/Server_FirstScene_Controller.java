@@ -182,7 +182,7 @@ public class Server_FirstScene_Controller
 
 	public void setText() throws InterruptedException {
 		TimeUnit.SECONDS.sleep(1);
-		Validation_Message.setText("                          Your are Allocated with system having IP: "+ Utility_server.SysAllocated_parser);
+		Validation_Message.setText("Your are Allocated with system having IP: "+ Utility_server.SysAllocated_parser);
 	}
 
 	@FXML
