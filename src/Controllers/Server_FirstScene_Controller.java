@@ -269,7 +269,6 @@ public class Server_FirstScene_Controller
 				{
 					// face detection
 					this.detectAndDisplay(frame);
-					
 					// convert the Mat object (OpenCV) to Image (JavaFX)
 					imageToShow = mat2Image(frame);
 				}
@@ -373,7 +372,6 @@ public class Server_FirstScene_Controller
 		Rect[] facesArray = faces.toArray(); 
 		for (int i = 0; i < facesArray.length; i++) {
 			Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
-
 			// Crop the detected faces
 			Rect rectCrop = new Rect(facesArray[i].tl(), facesArray[i].br());
 			Mat croppedImage = new Mat(frame, rectCrop);
@@ -457,8 +455,7 @@ public class Server_FirstScene_Controller
 					a.setTitle("RollNumber already Exists");
 					a.setContentText("The Roll Number which you entered already exists in the database");
 					a.show();
-					this.cameraButton.setDisable(true);
-
+					this.cameraButton.setDisable(false);
 				}else{
 					newUserName.clear();
 					Alert a = new Alert(Alert.AlertType.INFORMATION);
