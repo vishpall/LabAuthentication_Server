@@ -72,18 +72,11 @@ public class Server_FirstScene_Controller
 	public static boolean IsnewUser = false;
 	public int index = 0;
 	public int ind = 0;
-	// New user Name for a training data
 	public static String newRoll;
 	public static boolean IsUserValidated= false;
-	// Names of the people from the training set
 	public HashMap<Integer, String> names = new HashMap<Integer, String>();
-	
-	// Random number of a training set
 	public int random = (int )(Math.random() * 20 + 3);
-	
-	/**
-	 * Init the controller, at start time
-	 */
+	public static boolean TrainFace_Prompt= false;
 	public void init() throws IOException {
 		this.capture = new VideoCapture();
 		this.faceCascade = new CascadeClassifier();
@@ -130,13 +123,6 @@ public class Server_FirstScene_Controller
 							Image imageToShow = grabFrame();
 							originalFrame.setImage(imageToShow);
 						}
-						//System.out.println("i am done");
-						/*try {
-							ValidatingUser();
-							TimeUnit.SECONDS.sleep(1);
-						} catch (IOException | InterruptedException e) {
-							e.printStackTrace();
-						}*/
 					}
 				};
 				
@@ -144,22 +130,25 @@ public class Server_FirstScene_Controller
 				this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
 				
 				// update the button content
-				this.cameraButton.setText("Stop Camera");
+				this.cameraButton.setText("Restart Process"); // equivalent to stopping the camera
 			}
 			else
 			{
-				// log the error
 				System.err.println("Failed to open the camera connection...");
 			}
 		}
 		else
 		{
-
+			Alert EnterRollNo_Error = new Alert(Alert.AlertType.ERROR);
+			EnterRollNo_Error.setTitle("Roll Number Missing");
+			EnterRollNo_Error.setContentText("YOU ARE DETECTED AS NEW USER");
+			EnterRollNo_Error.setContentText("Please Enter Your Roll Number By selecting NewUser Checkbox and proceed");
+			EnterRollNo_Error.show();
 			this.cameraActive = false;
-			this.cameraButton.setText("Start Camera");
-
+			this.cameraButton.setText("Train Your face"); // equivalent to starting the camera.
+	        TrainFace_Prompt = true;
+	        IsnewUser = true;
 			this.newUser.setDisable(false);
-
 			try
 			{
 				this.timer.shutdown();
@@ -173,8 +162,6 @@ public class Server_FirstScene_Controller
 
 			this.capture.release();
 			this.originalFrame.setImage(null);
-			
-
 			index = 0;
 			newRoll = "";
 		}
@@ -243,6 +230,7 @@ public class Server_FirstScene_Controller
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			System.out.println("loading new scene");
 			Scene scene = new Scene(root);
 			Main_application.stage_storer.setScene(scene);
 			Main_application.stage_storer.show();
@@ -335,9 +323,6 @@ public class Server_FirstScene_Controller
 
 	
 	private double[] faceRecognition(Mat currentFace) {
-       	
-        	// predict the label
-        	
         	int[] predLabel = new int[1];
             double[] confidence = new double[1];
             int result = -1;
@@ -347,7 +332,6 @@ public class Server_FirstScene_Controller
         	faceRecognizer.predict(currentFace,predLabel,confidence);
 //        	result = faceRecognizer.predict_label(currentFace);
         	result = predLabel[0];
-        	
         	return new double[] {result,confidence[0]};
 	}
 	private void detectAndDisplay(Mat frame) throws IOException, InterruptedException {
@@ -355,7 +339,6 @@ public class Server_FirstScene_Controller
 		Mat grayFrame = new Mat();
 		Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 		Imgproc.equalizeHist(grayFrame, grayFrame);
-
 		if (this.absoluteFaceSize == 0)
 		{
 			int height = grayFrame.rows();
@@ -385,20 +368,14 @@ public class Server_FirstScene_Controller
 			Mat resizeImage = new Mat();
 			Size size = new Size(250,250);
 			Imgproc.resize(croppedImage, resizeImage, size);
-			
-			// check if 'New user' checkbox is selected
-			// if yes start collecting training data (50 images is enough)
-			if ((newUser.isSelected() && !newRoll.isEmpty())) {
+			if ((newUser.isSelected()&& !newRoll.isEmpty()) || TrainFace_Prompt) {
 				if (index<30) {
 					Imgcodecs.imwrite("resources/trainingset/combined/"+ random+"@"+newRoll + "_" + (index++) + ".png", resizeImage);
 				}
 			}
-//			int prediction = faceRecognition(resizeImage);
 			double[] returnedResults = faceRecognition(resizeImage);
 			double prediction = returnedResults[0];
 			double confidence = returnedResults[1];
-			
-//			System.out.println("PREDICTED LABEL IS: " + prediction);
 			int label = (int) prediction;
 			String name = "";
 			if (names.containsKey(label)) {
@@ -409,28 +386,34 @@ public class Server_FirstScene_Controller
 			String box_text;
 			if(IsnewUser){
 				box_text = "Taking Picture "+ index;
+				if(index == 30){
+					ValidatingUser();
+				}
 			}
 			else{
+				System.out.println(confidence);
 				if(confidence > 50.00 || name=="Unknown"){
 					box_text= "Unknown User.... Train your face";
+//					TrainFace_Prompt = true;
 				}else{
-					box_text="name"+name;
-					newRoll = name;
-					System.out.println("detected name:"+name);
-					TimeUnit.SECONDS.sleep(1);
-					ValidatingUser();
+					if(name.equals("null")){
+						box_text = "Unknown User.... Train your face";
+					}else{
+						box_text="name"+name;
+						newRoll = name;
+						System.out.println("detected name:"+name);
+						TimeUnit.SECONDS.sleep(1);
+						ValidatingUser();
+					}
 				}
 
 			}
 			double pos_x = Math.max(facesArray[i].tl().x - 10, 0);
             double pos_y = Math.max(facesArray[i].tl().y - 10, 0);
-            // And now put it into the image:
             Imgproc.putText(frame, box_text, new Point(pos_x, pos_y), 
-            		Core.FONT_HERSHEY_PLAIN, 1.0, new Scalar(0, 255, 0, 2.0));
+            		Core.FONT_HERSHEY_DUPLEX, 1.0, new Scalar(0, 255, 0, 2.0));
 		}
 	}
-
-	
 
 	@FXML
 	protected void newUserNameSubmitted() throws IOException {
@@ -440,7 +423,7 @@ public class Server_FirstScene_Controller
 			IsnewUser= true;
 			this.cameraButton.setText("TRAIN MY FACE");
 			Findfile ff= new Findfile();
-			String directory = "E:\\LabAuth_FaceReg\\resources\\trainingset\\combined";
+			String directory = "resources/trainingset/combined";
 			Pattern pattern = Pattern.compile(newRoll+"_1"+".png"+"$");
 			boolean file_found = ff.findFile(pattern,new File(directory));
 			if(!newRoll.matches(".*-.*-.*-.*")){
@@ -457,8 +440,10 @@ public class Server_FirstScene_Controller
 					a.setTitle("RollNumber already Exists");
 					a.setContentText("The Roll Number which you entered already exists in the database");
 					a.show();
-					this.cameraButton.setDisable(true);
-
+					cameraButton.setText("VERIFY IDENTITY");
+					newUserName.clear();
+					newUserName.setDisable(true);
+					IsnewUser = false;
 				}else{
 					newUserName.clear();
 					Alert a = new Alert(Alert.AlertType.INFORMATION);
