@@ -174,7 +174,7 @@ public class Server_FirstScene_Controller
 
 	@FXML
 	public void Reinitiate() throws IOException {
-
+		System.out.println(Thread.activeCount());
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("../Fxml_Files/Server_FirstScene.fxml"));
 		BorderPane root = null;
 		try {
@@ -184,7 +184,7 @@ public class Server_FirstScene_Controller
 		}
 		root.setStyle("-fx-background-color: whitesmoke;");
 		Scene scene = new Scene(root, 800, 600);
-		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		scene.getStylesheets().add(getClass().getResource("../css_files/application.css").toExternalForm());
 		Main_application.stage_storer.setTitle("Face Detection and Tracking");
 		Main_application.stage_storer.setScene(scene);
 		Main_application.stage_storer.show();

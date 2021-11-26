@@ -76,6 +76,7 @@ public class Utility_server {
 
             }
             catch(IOException i)            {
+
                 System.out.println(i);
             }
         }
@@ -83,8 +84,9 @@ public class Utility_server {
         // close the connection
         try
         {
-//            input.close();
+            input.close();
             out.close();
+            server.close();
             in.close();
             socket.close();
         }
