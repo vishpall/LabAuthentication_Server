@@ -76,6 +76,7 @@ public class Utility_server {
 
             }
             catch(IOException i)            {
+
                 System.out.println(i);
             }
         }
@@ -83,8 +84,9 @@ public class Utility_server {
         // close the connection
         try
         {
-//            input.close();
+            input.close();
             out.close();
+            server.close();
             in.close();
             socket.close();
         }
@@ -110,7 +112,6 @@ public class Utility_server {
                 //sc.close();
                 //System.out.print("You have entered: "+roll);
                 forName("com.mysql.cj.jdbc.Driver");
-
                 Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/lab","root","Lab@Authentication123");
                 Statement stmt = con.createStatement();
                 ResultSet rs=stmt.executeQuery("select * from clients where status=1");
