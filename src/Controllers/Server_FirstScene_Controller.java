@@ -43,6 +43,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.face.FaceRecognizer;
+import Utilities.*;
 
 
 public class Server_FirstScene_Controller
@@ -166,36 +167,39 @@ public class Server_FirstScene_Controller
 			newRoll = "";
 		}
 	}
+	public void reInitiate_server() throws IOException {
+		System.out.println(Thread.activeCount());
+		Platform.runLater(()->{
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("../Fxml_Files/Server_FirstScene.fxml"));
+			BorderPane root = null;
+			try {
+				root = (BorderPane) loader.load();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			root.setStyle("-fx-background-color: whitesmoke;");
+			Scene scene = new Scene(root, 800, 600);
+			scene.getStylesheets().add(getClass().getResource("../css_files/application.css").toExternalForm());
+			Main_application.stage_storer.setTitle("Face Detection and Tracking");
+			Main_application.stage_storer.setScene(scene);
+			Main_application.stage_storer.show();
 
+			Main_application.Start_server();
+			Server_FirstScene_Controller controller = loader.getController();
+			try {
+				controller.init();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+
+	}
 	public void setText() throws InterruptedException {
 		TimeUnit.SECONDS.sleep(1);
-		Validation_Message.setText("                          Your are Allocated with system having IP: "+ Utility_server.SysAllocated_parser);
+		Validation_Message.setText("Your are Allocated with system having IP: "+
+				Utility_server.SysAllocated_parser + "\nAllocated Time: 1 hour" + "\n Allocated User: Current User");
 	}
-
-	@FXML
-	public void Reinitiate() throws IOException {
-		System.out.println(Thread.activeCount());
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("../Fxml_Files/Server_FirstScene.fxml"));
-		BorderPane root = null;
-		try {
-			root = (BorderPane) loader.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		root.setStyle("-fx-background-color: whitesmoke;");
-		Scene scene = new Scene(root, 800, 600);
-		scene.getStylesheets().add(getClass().getResource("../css_files/application.css").toExternalForm());
-		Main_application.stage_storer.setTitle("Face Detection and Tracking");
-		Main_application.stage_storer.setScene(scene);
-		Main_application.stage_storer.show();
-
-		Main_application.Start_server();
-		Server_FirstScene_Controller controller = loader.getController();
-		controller.init();
-	}
-
 	public void ValidatingUser() throws IOException {
-
 		IsUserValidated = true;
 		IsnewUser= false;
 
@@ -234,8 +238,17 @@ public class Server_FirstScene_Controller
 			Scene scene = new Scene(root);
 			Main_application.stage_storer.setScene(scene);
 			Main_application.stage_storer.show();
+			try {
+				TimeUnit.SECONDS.sleep(4);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			try {
+				reInitiate_server();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		});
-
 	}
 
 	private Image grabFrame()
@@ -272,8 +285,6 @@ public class Server_FirstScene_Controller
 		
 		return imageToShow;
 	}
-	
-	
 	private void trainModel () throws IOException {
 		// Read the data from the training set
 				File root = new File("resources/trainingset/combined/");
@@ -320,8 +331,6 @@ public class Server_FirstScene_Controller
 		        	faceRecognizer.save("traineddata");
 
 	}
-
-	
 	private double[] faceRecognition(Mat currentFace) {
         	int[] predLabel = new int[1];
             double[] confidence = new double[1];
