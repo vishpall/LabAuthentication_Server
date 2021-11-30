@@ -32,7 +32,7 @@ public class Utility_server {
     public static String SysAllocated_parser;
     // constructor to put ip address and port
     public Utility_server(String address, String port, String roll, String name) throws IOException {
-        String[] str = new String[] {roll,name,"login","login"};
+        String[] str = new String[] {"1602-18-735-031","rohit","shutdown","login"};
         int j=0;
         try
         {
